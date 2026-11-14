@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok Printer</title>
+<style>
+:root{--ac:#fb7185;--ag:rgba(251,113,133,.5)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0d1c}
+#stage{position:absolute;left:50%;top:50%;width:720px;height:740px;margin:-370px 0 0 -360px;transform:scale(var(--s,1));overflow:hidden;font-family:"Inter","SF Pro Display","Segoe UI",system-ui,sans-serif;
+ background:
+  radial-gradient(520px 380px at 16% 6%,rgba(99,102,241,.40),transparent 70%),
+  radial-gradient(520px 420px at 94% 98%,rgba(236,72,153,.30),transparent 70%),
+  radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1.6px) 0 0/26px 26px,
+  linear-gradient(160deg,#0b1024,#150f30 60%,#1b0f2c)}
+body.polos #stage{background:none}
+#meja{position:absolute;inset:0;z-index:2}
+.lembar{position:absolute;inset:0;transition:transform .7s cubic-bezier(.4,0,.2,1),opacity .7s}
+.lembar.masuk{transform:translateY(46px) scale(.97);opacity:0}
+.lembar.keluar{transform:translateY(-60px) scale(.97);opacity:0}
+.slot{position:absolute;border-radius:30px;overflow:hidden;text-align:center;
+ background:linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,.04));
+ border:1px solid rgba(255,255,255,.16);
+ box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18);
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ transition:border-color .4s,box-shadow .4s}
+.slot.b{left:220px;top:120px;width:280px;height:336px}
+.slot.l{left:130px;top:474px;width:210px;height:252px}
+.slot.r{left:380px;top:474px;width:210px;height:252px}
+.slot.aktif{border-color:var(--ac);box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 0 1px var(--ac),0 0 28px var(--ag)}
+.slot.t-legendary{animation:denyut 2.4s ease-in-out infinite}
+@keyframes denyut{0%,100%{box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 0 1px var(--ac),0 0 26px var(--ag)}50%{box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 0 1px var(--ac),0 0 50px var(--ag)}}
+.slot.t-legendary::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,236,170,.26) 50%,transparent 65%);transform:translateX(-120%);animation:kilat 2.8s ease-in-out infinite}
+@keyframes kilat{to{transform:translateX(120%)}}
+.slot canvas{position:absolute;left:50%;top:12px;transform:translateX(-50%)}
+.slot.b canvas{top:14px}
+.pita{position:absolute;top:12px;left:12px;z-index:2;padding:4px 10px;border-radius:999px;font:800 11px/1 system-ui,sans-serif;letter-spacing:.12em;color:#1a1200;background:var(--ac);box-shadow:0 0 14px var(--ag);display:none}
+.slot.t-big .pita,.slot.t-legendary .pita{display:block}
+.nama{position:absolute;left:10px;right:10px;font-weight:800;color:#fff;white-space:nowrap;text-align:center;line-height:1.15;letter-spacing:.01em;opacity:0;text-shadow:0 0 16px var(--ag)}
+.nama .t{display:inline-block}
+.slot.b .nama{top:264px;font-size:30px}
+.slot.l .nama,.slot.r .nama{top:198px;font-size:22px}
+.sub{position:absolute;left:0;right:0;font-weight:700;font-size:12px;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.62);opacity:0;transition:opacity .5s}
+.slot.b .sub{top:304px}
+.slot.l .sub,.slot.r .sub{top:229px}
+.slot.selesai .sub{opacity:1}
+.kilau{position:absolute;width:10px;height:10px;background:#fff6c8;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:kilau 1.4s ease-in-out infinite}
+@keyframes kilau{0%,100%{transform:scale(0);opacity:0}50%{transform:scale(1.6);opacity:1}}
+#pena{position:absolute;left:0;top:0;z-index:7;pointer-events:none;opacity:0;transform-origin:0 0;transition:opacity .3s;will-change:transform;filter:drop-shadow(0 10px 10px rgba(0,0,0,.45))}
+#pena svg{position:absolute;left:-22px;top:-102px;overflow:visible}
+#pena .ac{fill:var(--ac)}
+#pena .gl{filter:drop-shadow(0 0 6px var(--ac))}
+.ink{position:absolute;width:5px;height:5px;margin:-2px 0 0 -2px;border-radius:50%;z-index:6;pointer-events:none;animation:ink .65s ease-out forwards}
+@keyframes ink{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+#legenda{position:absolute;left:516px;top:108px;width:180px;padding:10px 14px 4px;border-radius:22px;z-index:8;color:#fff;
+ background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 30px rgba(0,0,0,.3)}
+#legenda .baris{display:flex;align-items:center;gap:12px;height:52px;font:700 18px system-ui,sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+#legenda .ikon{font-size:30px;width:36px;text-align:center}
+#legenda .chev{text-align:center;opacity:.55;height:18px;font-size:16px;line-height:18px}
+body.tanpalegenda #legenda{display:none}
+#antre{position:absolute;left:16px;top:16px;z-index:9;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font:700 14px system-ui,sans-serif;letter-spacing:.04em;display:none}
+#robot{position:absolute;left:0;top:0;z-index:1;pointer-events:none;overflow:visible;transform-origin:100px 170px;transform:translate(260px,-4px);will-change:transform}
+#robot .ml{transform-box:fill-box;transform-origin:50% 50%}
+#lengan{position:absolute;left:0;top:0;z-index:6;pointer-events:none;overflow:visible;filter:drop-shadow(0 6px 5px rgba(0,0,0,.35))}
+#kartu{position:absolute;left:112px;top:8px;width:100px;height:118px;z-index:3;border-radius:12px;overflow:hidden;text-align:center;background:#f7fbfa;box-shadow:0 12px 24px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.5);opacity:0;transform:translateY(-140px) rotate(-9deg);transition:transform .6s cubic-bezier(.3,1.35,.5,1),opacity .35s;pointer-events:none}
+#kartu.on{opacity:1;transform:translateY(0) rotate(-6deg)}
+#kartu .kp{height:18px;background:var(--ac,#fb7185);color:#1a1200;font:800 9px/18px system-ui,sans-serif;letter-spacing:.14em}
+#kartu canvas{display:block;width:62px;height:62px;margin:8px auto 4px}
+#kartu .kn{padding:0 7px;font:800 12px/1.2 system-ui,sans-serif;color:#16231f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#kartu .kg{margin-top:3px;font:700 9px/1 system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#5b6b66}
+body.tanparobot #robot,body.tanparobot #lengan,body.tanparobot #kartu{display:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="robot" width="200" height="190" viewBox="0 0 200 190" aria-hidden="true">
+    <defs>
+      <linearGradient id="rb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9af5d8"/><stop offset=".5" stop-color="#52d6a8"/><stop offset="1" stop-color="#2a9a76"/></linearGradient>
+      <radialGradient id="rp"><stop offset="0" stop-color="#ff9db0" stop-opacity=".75"/><stop offset="1" stop-color="#ff9db0" stop-opacity="0"/></radialGradient>
+    </defs>
+    <ellipse cx="100" cy="176" rx="66" ry="7" fill="#000" opacity=".25"/>
+    <path d="M36,64 Q36,16 86,16 L114,16 Q164,16 164,64 L164,128 Q164,172 122,172 L78,172 Q36,172 36,128 Z" fill="url(#rb)"/>
+    <path d="M42,128 Q42,166 78,166 L122,166 Q158,166 158,128" fill="none" stroke="#1f7d5f" stroke-opacity=".35" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="64" cy="44" rx="17" ry="8" fill="#fff" opacity=".32" transform="rotate(-28 64 44)"/>
+    <rect x="62" y="8" width="76" height="14" rx="7" fill="#ff7a2f"/>
+    <circle cx="78" cy="15" r="2.8" fill="#ffd9c2"/><circle cx="100" cy="15" r="2.8" fill="#ffd9c2"/><circle cx="122" cy="15" r="2.8" fill="#ffd9c2"/>
+    <ellipse cx="55" cy="99" rx="13" ry="8" fill="url(#rp)"/><ellipse cx="145" cy="99" rx="13" ry="8" fill="url(#rp)"/>
+    <g id="mk" transform="translate(72,80)">
+      <g class="ml"><ellipse rx="9.5" ry="11.5" fill="#16231f"/><circle cx="-3.2" cy="-4.2" r="3.5" fill="#fff"/><circle cx="3.4" cy="3.8" r="1.7" fill="#fff" opacity=".9"/></g>
+      <path class="mh" d="M-10,4 Q0,-9 10,4" fill="none" stroke="#16231f" stroke-width="3.6" stroke-linecap="round" style="display:none"/>
+    </g>
+    <g id="mn" transform="translate(128,80)">
+      <g class="ml"><ellipse rx="9.5" ry="11.5" fill="#16231f"/><circle cx="-3.2" cy="-4.2" r="3.5" fill="#fff"/><circle cx="3.4" cy="3.8" r="1.7" fill="#fff" opacity=".9"/></g>
+      <path class="mh" d="M-10,4 Q0,-9 10,4" fill="none" stroke="#16231f" stroke-width="3.6" stroke-linecap="round" style="display:none"/>
+    </g>
+    <g id="bk" transform="translate(72,62)"><path d="M-11,1 Q0,-3 11,-1" fill="none" stroke="#16231f" stroke-width="3.4" stroke-linecap="round"/></g>
+    <g id="bn" transform="translate(128,62)"><path d="M-11,-1 Q0,-3 11,1" fill="none" stroke="#16231f" stroke-width="3.4" stroke-linecap="round"/></g>
+    <path id="mu" d="M89,101 Q100,110 111,101" fill="none" stroke="#16231f" stroke-width="3.2" stroke-linecap="round"/>
+    <g id="muO" style="display:none"><path d="M87,98 Q100,121 113,98 Z" fill="#16231f" stroke="#16231f" stroke-width="3" stroke-linejoin="round"/><path d="M93,110 Q100,105 107,110 Q100,117 93,110 Z" fill="#ff7a8a"/></g>
+    <circle cx="38" cy="106" r="9" fill="#ff7a2f" stroke="#d65d17" stroke-width="2"/><circle cx="38" cy="106" r="3.4" fill="#ffe3d1"/>
+    <circle cx="162" cy="106" r="9" fill="#ff7a2f" stroke="#d65d17" stroke-width="2"/><circle cx="162" cy="106" r="3.4" fill="#ffe3d1"/>
+  </svg>
+  <div id="kartu"><div class="kp"></div><canvas id="kfoto" width="160" height="160"></canvas><div class="kn"></div><div class="kg"></div></div>
+  <div id="meja"></div>
+  <svg id="lengan" width="720" height="740" viewBox="0 0 720 740" aria-hidden="true">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path id="lo0" stroke="#1f7d5f" stroke-width="11"/><path id="lo1" stroke="#1f7d5f" stroke-width="11"/>
+      <path id="lf0" stroke="#74e8c3" stroke-width="6.5"/><path id="lf1" stroke="#74e8c3" stroke-width="6.5"/>
+    </g>
+    <g fill="#ff7a2f" stroke="#d65d17" stroke-width="1.6">
+      <circle id="ks0" r="7"/><circle id="ks1" r="7"/><circle id="ke0" r="6.5"/><circle id="ke1" r="6.5"/>
+    </g>
+  </svg>
+  <div id="pena"><svg width="44" height="104" viewBox="0 0 44 104" aria-hidden="true">
+    <defs>
+      <linearGradient id="gb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9af5d8"/><stop offset=".5" stop-color="#4fd1a5"/><stop offset="1" stop-color="#2ea67f"/></linearGradient>
+      <linearGradient id="gk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f4f5f8"/><stop offset="1" stop-color="#9aa1b2"/></linearGradient>
+    </defs>
+    <polygon points="22,102 15,84 29,84" fill="url(#gk)"/>
+    <polygon points="22,102 19.6,95.5 24.4,95.5" class="ac"/>
+    <rect x="13" y="70" width="18" height="16" rx="3" fill="#aeb4c2"/>
+    <rect x="11" y="10" width="22" height="64" rx="9" fill="url(#gb)"/>
+    <rect x="14" y="14" width="4" height="50" rx="2" fill="#fff" opacity=".35"/>
+    <rect x="9" y="50" width="26" height="9" rx="4" fill="#ff7a2f"/>
+    <rect x="15" y="2" width="14" height="12" rx="5" fill="#2a9a76"/>
+    <circle cx="22" cy="102" r="3.2" class="ac gl"/>
+  </svg></div>
+  <div id="legenda"></div>
+  <div id="antre"></div>
+</div>
+<script>
+(() => {
+  const P = new URLSearchParams(location.search);
+  const KEC = Math.max(1, +P.get('cepat') || 1);          // pengali kecepatan (dipakai tes)
+  if (P.get('bg') === '0') document.body.classList.add('polos');
+  if (P.get('legenda') === '0') document.body.classList.add('tanpalegenda');
+  if (P.get('robot') === '0') document.body.classList.add('tanparobot');   // ?robot=0 -> pena saja, tanpa robot
+  const $ = id => document.getElementById(id);
+  const stage = $('stage'), meja = $('meja'), penEl = $('pena');
+  const DUR = { print: 3000, big: 4000, legendary: 5400 };
+  const TIER = {
+    print: { ac: '#fb7185', ag: 'rgba(251,113,133,.55)', label: 'Print' },
+    big: { ac: '#fb923c', ag: 'rgba(251,146,60,.55)', label: 'Big Print' },
+    legendary: { ac: '#fbbf24', ag: 'rgba(251,191,36,.65)', label: 'Legendary' },
+  };
+  const Q = 2, TAU = Math.PI * 2;
+  let gen = 0;
+  const tidur = ms => new Promise(r => setTimeout(r, ms / KEC));
+  const jalan = (ms, fn) => new Promise(res => {
+    const g0 = gen, t0 = performance.now(), d = Math.max(1, ms / KEC);
+    (function f() { if (g0 !== gen) return res(); const u = Math.min(1, (performance.now() - t0) / d); fn(u); u < 1 ? requestAnimationFrame(f) : res(); })();
+  });
+  const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+
+  function ukur() { stage.style.setProperty('--s', Math.min(innerWidth / 720, innerHeight / 740)); }
+  addEventListener('resize', ukur); ukur();
+
+  // ---- legenda tingkat hadiah ----
+  const LEG0 = [{ ikon: '🌹', label: 'Print' }, { ikon: '🍩', label: 'Big Print' }, { ikon: '💎', label: 'Legendary' }];
+  function isiLegenda(items) {
+    const L = $('legenda'); L.textContent = '';
+    for (const it of items) {
+      const b = document.createElement('div'); b.className = 'baris';
+      const i = document.createElement('span'); i.className = 'ikon'; i.textContent = String(it.ikon || '').slice(0, 4);
+      const t = document.createElement('span'); t.textContent = String(it.label || '').slice(0, 20);
+      b.append(i, t); L.append(b);
+    }
+    const c = document.createElement('div'); c.className = 'chev'; c.textContent = '⌃'; L.append(c);
+  }
+  isiLegenda(LEG0);
+  fetch('api/config').then(r => r.json()).then(c => { if (Array.isArray(c.legenda) && c.legenda.length) isiLegenda(c.legenda); }).catch(() => {});
+
+  // ---- kanvas gambar per slot: foto terungkap mengikuti jalur spiral ujung pena ----
+  const GEO = { b: { R: 105 }, l: { R: 75 }, r: { R: 75 } };
+  const warna = n => { let h = 0; for (const ch of n) h = (h * 31 + ch.codePointAt(0)) % 360; return 'hsl(' + h + ',55%,45%)'; };
+  function fotoKe(t, st) {
+    const c0 = st.sz / 2, R = st.R, nm = st.nama || '?';
+    t.save(); t.beginPath(); t.arc(c0, c0, R, 0, TAU); t.clip();
+    if (st.img) {
+      const s = Math.max(2 * R / st.img.naturalWidth, 2 * R / st.img.naturalHeight), w = st.img.naturalWidth * s, h = st.img.naturalHeight * s;
+      t.drawImage(st.img, c0 - w / 2, c0 - h / 2, w, h);
+    } else {
+      t.fillStyle = warna(nm); t.fillRect(c0 - R, c0 - R, 2 * R, 2 * R);
+      t.fillStyle = '#fff'; t.font = '800 ' + Math.round(R * .95) + 'px system-ui,sans-serif'; t.textAlign = 'center'; t.textBaseline = 'middle';
+      t.fillText((Array.from(nm.trim())[0] || '?').toUpperCase(), c0, c0 + R * .04);
+    }
+    t.restore();
+  }
+  // o = { a: kemajuan cincin 0..1, b: kemajuan spiral 0..1, t: alpha garis jejak 0..1 }
+  function gambar(st, o) {
+    const g = st.g, c0 = st.sz / 2, R = st.R, rr = R + 4;
+    g.setTransform(Q, 0, 0, Q, 0, 0); g.clearRect(0, 0, st.sz, st.sz);
+    g.save(); g.setLineDash([3, 7]); g.lineWidth = 1.5; g.strokeStyle = 'rgba(255,255,255,.3)';
+    g.beginPath(); g.arc(c0, c0, rr, 0, TAU); g.stroke(); g.restore();
+    if (st.pts && o.b > 0) {
+      const L = st.pts.length, n = o.b >= 1 ? L : Math.max(2, Math.floor(o.b * (L - 1)) + 1);
+      const r = st.rg; r.setTransform(Q, 0, 0, Q, 0, 0); r.clearRect(0, 0, st.sz, st.sz);
+      r.strokeStyle = '#fff'; r.fillStyle = '#fff'; r.lineWidth = st.lw; r.lineCap = 'round'; r.lineJoin = 'round';
+      r.beginPath(); for (let i = 0; i < n; i++) { const p = st.pts[i]; if (i) r.lineTo(p[0], p[1]); else r.moveTo(p[0], p[1]); } r.stroke();
+      if (o.b >= 1) { r.beginPath(); r.arc(c0, c0, R, 0, TAU); r.fill(); }
+      const t = st.tg; t.setTransform(Q, 0, 0, Q, 0, 0); t.globalCompositeOperation = 'source-over'; t.clearRect(0, 0, st.sz, st.sz);
+      fotoKe(t, st);
+      t.setTransform(1, 0, 0, 1, 0, 0); t.globalCompositeOperation = 'destination-in'; t.drawImage(st.rcv, 0, 0); t.globalCompositeOperation = 'source-over';
+      g.drawImage(st.tcv, 0, 0, st.sz, st.sz);
+      if (o.t > 0) {
+        g.save(); g.globalAlpha = .4 * o.t; g.strokeStyle = st.ac; g.lineWidth = 1.2; g.lineJoin = 'round';
+        g.beginPath(); for (let i = 0; i < n; i++) { const p = st.pts[i]; if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); } g.stroke(); g.restore();
+      }
+    }
+    if (o.a > 0) {
+      g.save(); g.strokeStyle = st.ac; g.lineWidth = 3.5; g.lineCap = 'round'; g.shadowColor = st.ag; g.shadowBlur = 12;
+      g.beginPath(); g.arc(c0, c0, rr, -Math.PI / 2, -Math.PI / 2 + TAU * Math.min(1, o.a)); g.stroke(); g.restore();
+    }
+  }
+  function siapSlot(st, tier) {
+    const mk = () => { const c = document.createElement('canvas'); c.width = c.height = st.sz * Q; return c; };
+    st.rcv = mk(); st.rg = st.rcv.getContext('2d'); st.tcv = mk(); st.tg = st.tcv.getContext('2d');
+    const rr = st.R + 4, pitch = tier === 'print' ? 10 : 7, N = Math.max(5, Math.round(rr / pitch)), per = 72, M = N * per, c0 = st.sz / 2;
+    st.lw = (rr / N) * 1.5; st.pts = [];
+    for (let i = 0; i <= M; i++) { const u = i / M, th = -Math.PI / 2 + TAU * N * u, r = rr * (1 - u); st.pts.push([c0 + r * Math.cos(th), c0 + r * Math.sin(th)]); }
+  }
+
+  // ---- kertas (lembar) dan slot ----
+  let lembar = null;
+  function buatSlot(kode) {
+    const s = document.createElement('div'); s.className = 'slot ' + kode;
+    const R = GEO[kode].R, sz = 2 * (R + 16);
+    s.innerHTML = '<div class="pita"></div><canvas></canvas><div class="nama"><span class="t"></span></div><div class="sub"></div>';
+    const c = s.querySelector('canvas'); c.width = c.height = sz * Q; c.style.width = c.style.height = sz + 'px';
+    const st = { el: s, pakai: false, R, sz, c, g: c.getContext('2d'), pts: null, img: null, nama: '', ac: '#fff', ag: 'rgba(255,255,255,.4)' };
+    gambar(st, { a: 0, b: 0, t: 0 });
+    return st;
+  }
+  function buatLembar() {
+    const w = document.createElement('div'); w.className = 'lembar masuk';
+    const slots = {};
+    for (const kode of ['b', 'l', 'r']) { const st = buatSlot(kode); w.append(st.el); slots[kode] = st; }
+    meja.append(w);
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.remove('masuk')));
+    return { el: w, slots, siap: performance.now() + 780 };
+  }
+  lembar = buatLembar();
+  const pilih = tier => { for (const k of (tier === 'print' ? ['l', 'r', 'b'] : ['b'])) if (!lembar.slots[k].pakai) return k; return null; };
+  async function lembarBaru() {
+    const lama = lembar; lama.el.classList.add('keluar'); suara.kertas();
+    await tidur(350); lembar = buatLembar();
+    setTimeout(() => lama.el.remove(), 1000); await tidur(750);
+  }
+
+  // ---- suara printer (Web Audio, tanpa file audio) ----
+  // ?suara=0 -> bisu | ?vol=0.6 -> volume 0..1
+  const suara = (() => {
+    const MUTE = P.get('suara') === '0', VOL = P.get('vol') === null ? 0.9 : Math.min(1, Math.max(0, +P.get('vol') || 0));
+    let ac = null, master = null, noiseBuf = null, aktif = null, an = null, gestur = false, diuji = false;
+    const hint = document.createElement('div');
+    hint.textContent = '🔇 klik layar untuk suara';
+    hint.style.cssText = 'position:absolute;right:14px;top:14px;z-index:9;padding:4px 12px;border-radius:14px;background:rgba(0,0,0,.55);color:#fff;font:700 15px system-ui,sans-serif;display:none;cursor:pointer';
+    stage.append(hint);
+    function tandai() { if (ac && ac.state === 'running' && gestur && !diuji) { diuji = true; bip(); } hint.style.display = (MUTE || document.body.classList.contains('polos') || (ac && ac.state === 'running')) ? 'none' : 'block'; }
+    function init() {
+      if (ac || MUTE) return ac;
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+      ac = new AC(); master = ac.createGain(); master.gain.value = VOL; master.connect(ac.destination); an = ac.createAnalyser(); an.fftSize = 1024; master.connect(an);
+      window.__suaraNilai = () => { const d = new Float32Array(an.fftSize); an.getFloatTimeDomainData(d); let m = 0; for (const x of d) m += x * x; return { rms: Math.sqrt(m / d.length), state: ac.state }; };
+      noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      ac.onstatechange = tandai; return ac;
+    }
+    function bip() { const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(.2, t + .01); g.gain.exponentialRampToValueAtTime(0.0001, t + .2); o.connect(g); g.connect(master); o.start(t); o.stop(t + .25); }
+    function buka() { if (!init()) return; if (ac.state !== 'running') ac.resume().catch(() => {}); tandai(); }
+    ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, () => { gestur = true; buka(); }, { passive: true }));
+    init(); tandai(); setTimeout(tandai, 600);
+
+    function ding(tier) {
+      if (!ac) return;
+      const notes = tier === 'legendary' ? [784, 988, 1175, 1568, 2093] : tier === 'big' ? [1046.5, 1568] : [1318.5];
+      const t0 = ac.currentTime + 0.03;
+      notes.forEach((f, i) => {
+        const t = t0 + i * 0.09 / KEC;
+        for (const [fr, vol] of [[f, 0.5], [f * 2, 0.14]]) {
+          const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.value = fr;
+          g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + (tier === 'legendary' ? 1.1 : 0.65));
+          o.connect(g); g.connect(master); o.start(t); o.stop(t + 1.2);
+        }
+      });
+    }
+    function mulai(tier) {
+      buka(); if (!ac || aktif) return;
+      const t = ac.currentTime, v = ac.createGain(), pan = ac.createStereoPanner ? ac.createStereoPanner() : null;
+      v.gain.setValueAtTime(0.0001, t); v.gain.exponentialRampToValueAtTime(1.2, t + 0.12);
+      // desis jarum pin (noise yang berdenyut cepat)
+      const n = ac.createBufferSource(); n.buffer = noiseBuf; n.loop = true;
+      const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = tier === 'legendary' ? 5200 : 4200; bp.Q.value = 1.4;
+      const pin = ac.createGain(); pin.gain.value = 0.5;
+      const lfo = ac.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = tier === 'print' ? 13 : 17;
+      const ld = ac.createGain(); ld.gain.value = 0.45; lfo.connect(ld); ld.connect(pin.gain);
+      n.connect(bp); bp.connect(pin);
+      // dengung motor kepala, nadanya naik-turun mengikuti sapuan
+      const m = ac.createOscillator(); m.type = 'sawtooth'; m.frequency.value = tier === 'legendary' ? 110 : tier === 'big' ? 95 : 82;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+      const mg = ac.createGain(); mg.gain.value = 0.02; m.connect(lp); lp.connect(mg);
+      const sw = ac.createOscillator(); sw.frequency.value = KEC / (2 * Math.PI * 0.17);
+      const sd = ac.createGain(); sd.gain.value = 18; sw.connect(sd); sd.connect(m.frequency);
+      pin.connect(v); mg.connect(v); v.connect(pan || master); if (pan) pan.connect(master);
+      const nodes = [n, lfo, m, sw]; nodes.forEach(x => x.start(t));
+      // klik awal
+      const k = ac.createBufferSource(); k.buffer = noiseBuf; const kg = ac.createGain();
+      kg.gain.setValueAtTime(0.5, t); kg.gain.exponentialRampToValueAtTime(0.0001, t + 0.05); k.connect(kg); kg.connect(master); k.start(t, 0, 0.06);
+      aktif = { v, pan, nodes };
+    }
+    function henti(tier, bunyi) {
+      if (!aktif) return;
+      const a = aktif; aktif = null; const t = ac.currentTime;
+      a.v.gain.cancelScheduledValues(t); a.v.gain.setValueAtTime(Math.max(0.0001, a.v.gain.value), t); a.v.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+      a.nodes.forEach(x => { try { x.stop(t + 0.2); } catch {} });
+      if (bunyi) ding(tier);
+    }
+    return {
+      mulai,
+      selesai: tier => henti(tier, true),
+      henti: () => henti(null, false),
+      pan: x => { if (aktif && aktif.pan) aktif.pan.pan.value = Math.max(-1, Math.min(1, (x - 360) / 360)) * 0.6; },
+      kertas: () => { // desir kertas ditarik
+        if (!ac) return;
+        const t = ac.currentTime, n = ac.createBufferSource(); n.buffer = noiseBuf;
+        const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.9; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(350, t + 0.55);
+        const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.06); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+        n.connect(f); f.connect(g); g.connect(master); n.start(t, 0, 0.65);
+      },
+    };
+  })();
+
+
+  // ---- pena + robot penggambar ----
+  // Badan robot duduk di belakang kertas; dua lengan engsel memegang pena, mata mengikuti ujung pena.
+  const ROBOT = P.get('robot') !== '0';
+  const HOME = { x: 292, y: 146 };                          // pena "istirahat" di samping badan
+  const pen = { x: HOME.x, y: ROBOT ? HOME.y : 800 };
+  let warnaKini = TIER.print, cacahPercik = 0;
+  function penSet(x, y) { pen.x = x; pen.y = y; suara.pan(x); }
+  if (ROBOT) penEl.style.opacity = 1;
+
+  const RB = { mode: 'diam', bx: 0, by: 0, tilt: 0, pt: 0, px: pen.x, k: 1, kedipDi: 0, kedipSd: 0, ts: 0 };
+  const ORG = { x: 260, y: -4 }, PIV = { x: 100, y: 170 };   // asal svg badan & titik putar (dasar badan)
+  const BAHU = [{ x: 38, y: 106 }, { x: 162, y: 106 }], MATA = [{ x: 72, y: 80 }, { x: 128, y: 80 }];
+  const rb = $('robot'), MK = [$('mk'), $('mn')];
+  const ML = [...document.querySelectorAll('#robot .ml')], MH = [...document.querySelectorAll('#robot .mh')];
+  const ARM = [0, 1].map(i => ({ lo: $('lo' + i), lf: $('lf' + i), s: $('ks' + i), e: $('ke' + i) }));
+  const klem = (v, a, b) => Math.max(a, Math.min(b, v));
+  const dunia = (lx, ly) => {                                // titik lokal badan -> koordinat stage
+    const a = RB.tilt * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), dx = lx - PIV.x, dy = ly - PIV.y;
+    return { x: ORG.x + PIV.x + RB.bx + dx * c - dy * s, y: ORG.y + PIV.y + RB.by + dx * s + dy * c };
+  };
+  function wajah(m) {                                        // 'diam' | 'kerja' | 'senang'
+    RB.mode = m; const sn = m === 'senang';
+    $('mu').style.display = sn ? 'none' : ''; $('muO').style.display = sn ? '' : 'none';
+    $('mu').setAttribute('d', m === 'kerja' ? 'M92,101 Q100,106 108,101' : 'M89,101 Q100,110 111,101');
+    ML.forEach(e => { e.style.display = sn ? 'none' : ''; }); MH.forEach(e => { e.style.display = sn ? '' : 'none'; });
+    const a = m === 'kerja' ? 12 : sn ? -9 : 0, y = sn ? -4 : 0;
+    $('bk').setAttribute('transform', 'translate(72,' + (62 + y) + ') rotate(' + a + ')');
+    $('bn').setAttribute('transform', 'translate(128,' + (62 + y) + ') rotate(' + (-a) + ')');
+  }
+  function bingkai(now) {
+    requestAnimationFrame(bingkai);
+    // pena miring mengikuti arah gerak (berputar di ujungnya)
+    const vx = pen.x - RB.px; RB.px = pen.x;
+    RB.pt += (klem(vx * 1.1 + (pen.x - 360) * 0.012, -16, 16) - RB.pt) * 0.25;
+    penEl.style.transform = 'translate(' + pen.x.toFixed(1) + 'px,' + pen.y.toFixed(1) + 'px) rotate(' + RB.pt.toFixed(2) + 'deg)';
+    if (!ROBOT) return;
+    const kerja = RB.mode === 'kerja';
+    RB.bx += (klem((pen.x - 360) * 0.12, -34, 34) - RB.bx) * 0.12;                 // badan condong ke arah pena
+    RB.tilt += (klem((pen.x - 360) * 0.03, -9, 9) - RB.tilt) * 0.12;
+    RB.by = Math.sin(now / (kerja ? 130 : 640)) * (kerja ? 1.3 : 2.6);              // napas / getar kerja
+    rb.style.transform = 'translate(' + (ORG.x + RB.bx).toFixed(1) + 'px,' + (ORG.y + RB.by).toFixed(1) + 'px) rotate(' + RB.tilt.toFixed(2) + 'deg)';
+    // lengan: dua ruas dengan siku menekuk ke luar, ujungnya di cincin pena
+    const ap = RB.pt * Math.PI / 180, cx = pen.x + 48 * Math.sin(ap), cy = pen.y - 48 * Math.cos(ap);
+    for (let i = 0; i < 2; i++) {
+      const S = dunia(BAHU[i].x, BAHU[i].y), sisi = i ? 1 : -1, dx = cx - S.x, dy = cy - S.y, d = Math.hypot(dx, dy) || 1;
+      let nx = -dy / d, ny = dx / d;
+      if (nx * sisi < 0) { nx = -nx; ny = -ny; }
+      if (Math.abs(nx) < 0.35 && ny < 0) { nx = -nx; ny = -ny; }                    // hampir mendatar: siku turun, jangan menutupi muka
+      const bul = Math.min(64, 12 + d * 0.2), ex = (S.x + cx) / 2 + nx * bul, ey = (S.y + cy) / 2 + ny * bul;
+      const dd = 'M' + S.x.toFixed(1) + ' ' + S.y.toFixed(1) + 'L' + ex.toFixed(1) + ' ' + ey.toFixed(1) + 'L' + cx.toFixed(1) + ' ' + cy.toFixed(1);
+      ARM[i].lo.setAttribute('d', dd); ARM[i].lf.setAttribute('d', dd);
+      ARM[i].s.setAttribute('cx', S.x.toFixed(1)); ARM[i].s.setAttribute('cy', S.y.toFixed(1));
+      ARM[i].e.setAttribute('cx', ex.toFixed(1)); ARM[i].e.setAttribute('cy', ey.toFixed(1));
+    }
+    // mata melirik ke ujung pena
+    for (let i = 0; i < 2; i++) {
+      const E = dunia(MATA[i].x, MATA[i].y), dx = pen.x - E.x, dy = pen.y - 10 - E.y, d = Math.hypot(dx, dy) || 1, m = Math.min(4.2, d / 55);
+      MK[i].setAttribute('transform', 'translate(' + (MATA[i].x + dx / d * m).toFixed(2) + ',' + (MATA[i].y + dy / d * m).toFixed(2) + ')');
+    }
+    if (now > RB.kedipDi) { RB.kedipSd = now + 130; RB.kedipDi = now + 2400 + Math.random() * 3200; }
+    const k = now < RB.kedipSd ? 0.1 : 1;
+    if (k !== RB.k) { RB.k = k; ML.forEach(e => { e.style.transform = 'scaleY(' + k + ')'; }); }
+  }
+  wajah('diam'); requestAnimationFrame(bingkai);
+
+  // kartu referensi di samping robot (seperti kartu gajah di video): foto + nama + gift yang sedang digambar
+  const kartu = $('kartu'), kg = $('kfoto').getContext('2d');
+  async function kartuTampil(T, nama, gift, jml, st) {
+    if (!ROBOT) return;
+    const g0 = gen;
+    if (kartu.classList.contains('on')) { kartu.classList.remove('on'); await tidur(260); if (g0 !== gen) return; }
+    kg.setTransform(1, 0, 0, 1, 0, 0); kg.clearRect(0, 0, 160, 160);
+    fotoKe(kg, { sz: 160, R: 74, img: st.img, nama });
+    kartu.style.setProperty('--ac', T.ac);
+    kartu.querySelector('.kp').textContent = T.label.toUpperCase();
+    kartu.querySelector('.kn').textContent = nama;
+    kartu.querySelector('.kg').textContent = gift + (jml > 1 ? ' \u00d7' + jml : '');
+    kartu.classList.add('on');
+  }
+  const kartuTutup = () => kartu.classList.remove('on');
+  function bintang(T) {
+    for (let i = 0; i < 6; i++) {
+      const k = document.createElement('i'); k.className = 'kilau';
+      k.style.left = (300 + Math.random() * 120) + 'px'; k.style.top = (4 + Math.random() * 70) + 'px';
+      k.style.animationDelay = (Math.random() * .5) + 's'; k.style.background = T.ac; k.style.zIndex = 8;
+      stage.append(k); setTimeout(() => k.remove(), 1800);
+    }
+  }
+  function senang(T) {                                       // selesai satu cetakan: robot girang sebentar
+    if (!ROBOT) return;
+    wajah('senang'); bintang(T); clearTimeout(RB.ts);
+    RB.ts = setTimeout(() => { if (RB.mode === 'senang') { wajah(antre.length ? 'kerja' : 'diam'); if (!antre.length) kartuTutup(); } }, 1100 / KEC);
+  }
+  function percik(x, y) {
+    if ((++cacahPercik) % 3) return;
+    const i = document.createElement('i'); i.className = 'ink';
+    i.style.left = x + 'px'; i.style.top = y + 'px'; i.style.background = warnaKini.ac; i.style.boxShadow = '0 0 8px ' + warnaKini.ag;
+    i.style.setProperty('--dx', ((Math.random() - .5) * 34).toFixed(1) + 'px'); i.style.setProperty('--dy', (-8 - Math.random() * 22).toFixed(1) + 'px');
+    stage.append(i); setTimeout(() => i.remove(), 700);
+  }
+  function penTitik(x, y) { penSet(x + (Math.random() - .5) * .8, y + (Math.random() - .5) * .8); percik(x, y); }
+  async function penTerbang(x, y, ms) {
+    const x0 = pen.x, y0 = pen.y;
+    await jalan(ms, u => { const e = ease(u); penSet(x0 + (x - x0) * e, y0 + (y - y0) * e - Math.sin(Math.PI * u) * 24); });
+    penSet(x, y);
+  }
+  async function penKeluar() {
+    if (!ROBOT) { penEl.style.opacity = 0; await penTerbang(pen.x + 70, 800, 450); return; }
+    await penTerbang(HOME.x, HOME.y, 520);
+  }
+  const asal = el => { const rs = stage.getBoundingClientRect(), r = el.getBoundingClientRect(), sc = rs.width / 720; return { x: (r.left - rs.left) / sc, y: (r.top - rs.top) / sc, w: r.width / sc, h: r.height / sc }; };
+
+  function muatFoto(avatar) {
+    return new Promise(res => {
+      if (!/^https:\/\//.test(avatar || '')) return res(null);
+      const im = new Image(); let ok = false;
+      const akhir = v => { if (ok) return; ok = true; res(v); };
+      im.onload = () => akhir(im.naturalWidth ? im : null); im.onerror = () => akhir(null); im.referrerPolicy = 'no-referrer'; im.src = avatar;
+      setTimeout(() => akhir(null), 3000);
+    });
+  }
+  function kilau(el) {
+    for (let i = 0; i < 14; i++) {
+      const k = document.createElement('i'); k.className = 'kilau';
+      k.style.left = (Math.random() * 94) + '%'; k.style.top = (Math.random() * 90) + '%'; k.style.animationDelay = (Math.random() * 1.4) + 's'; el.append(k);
+    }
+  }
+
+  // ---- satu pencetakan: pena menggambar cincin, mengarsir foto dengan spiral, lalu menulis nama ----
+  async function cetak(ev) {
+    const g0 = gen, batal = () => g0 !== gen;
+    const tier = TIER[ev.tier] ? ev.tier : 'print', T = TIER[tier];
+    let k = pilih(tier);
+    if (!k) { await penKeluar(); await lembarBaru(); k = pilih(tier); }
+    if (batal() || !k) return;
+    const st = lembar.slots[k]; st.pakai = true;
+    const el = st.el, nama = String(ev.nama || 'penonton').slice(0, 24);
+    st.ac = T.ac; st.ag = T.ag; st.nama = nama;
+    el.style.setProperty('--ac', T.ac); el.style.setProperty('--ag', T.ag);
+    el.classList.add('t-' + tier, 'aktif');
+    el.querySelector('.pita').textContent = T.label.toUpperCase();
+    penEl.style.setProperty('--ac', T.ac); penEl.style.setProperty('--ag', T.ag); warnaKini = T;
+    const jml = Math.min(9999, +ev.jumlah || 1), gift = String(ev.gift || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 22);
+    el.querySelector('.sub').textContent = [gift || T.label, jml > 1 ? '\u00d7' + jml : ''].filter(Boolean).join('  ');
+    st.img = await muatFoto(ev.avatar);
+    if (batal()) return;
+    siapSlot(st, tier);
+    wajah('kerja'); kartuTampil(T, nama, gift || T.label, jml, st);
+    const dasar = el.classList.contains('b') ? 30 : 22, n = el.querySelector('.nama'), t = n.querySelector('.t');
+    t.textContent = nama; n.style.fontSize = dasar + 'px'; t.style.clipPath = 'inset(0 100% 0 0)';
+    if (t.offsetWidth > el.clientWidth - 28) n.style.fontSize = Math.max(12, dasar * (el.clientWidth - 28) / t.offsetWidth) + 'px';
+    n.style.opacity = 1;
+    const tunggu = lembar.siap - performance.now(); if (tunggu > 0) await new Promise(r => setTimeout(r, tunggu));
+    if (batal()) return;
+    const org = asal(st.c), cx = org.x + st.sz / 2, cy = org.y + st.sz / 2, rr = st.R + 4, dur = DUR[tier];
+    penEl.style.opacity = 1;
+    await penTerbang(cx, cy - rr, 520); if (batal()) return;
+    suara.mulai(tier);
+    // A. cincin digambar searah jarum jam
+    await jalan(dur * 0.2, u => {
+      const e = ease(u), th = -Math.PI / 2 + TAU * e;
+      gambar(st, { a: e, b: 0, t: 0 }); penTitik(cx + rr * Math.cos(th), cy + rr * Math.sin(th));
+    });
+    if (batal()) return;
+    // B. foto diarsir dengan spiral ke arah tengah (kecepatan ujung pena dibuat rata)
+    await jalan(dur * 0.6, u => {
+      const e = ease(u), uu = e >= 1 ? 1 : 1 - Math.sqrt(1 - e);
+      gambar(st, { a: 1, b: uu, t: 1 });
+      const p = st.pts[Math.min(st.pts.length - 1, Math.floor(uu * (st.pts.length - 1)))];
+      penTitik(org.x + p[0], org.y + p[1]);
+    });
+    if (batal()) return;
+    // C. garis jejak memudar, pena pindah ke awal nama
+    const rt = asal(t), x1 = rt.x, x2 = rt.x + rt.w, yb = rt.y + rt.h * 0.74;
+    await Promise.all([jalan(300, u => gambar(st, { a: 1, b: 1, t: 1 - u })), penTerbang(x1, yb, 380)]);
+    if (batal()) return;
+    // D. pena menulis nama dari kiri ke kanan
+    await jalan(dur * 0.2, u => {
+      const e = ease(u);
+      t.style.clipPath = 'inset(0 ' + ((1 - e) * 100).toFixed(1) + '% 0 0)';
+      penTitik(x1 + (x2 - x1) * e, yb + Math.sin(e * 44) * 3);
+    });
+    t.style.clipPath = 'none';
+    suara.selesai(tier); el.classList.add('selesai'); if (tier === 'legendary') kilau(el); senang(T);
+    if (batal()) return;
+    if (!antre.length) await penKeluar(); else await tidur(220);
+  }
+
+  // ---- antrean ----
+  const antre = []; let sibuk = false;
+  const tampilAntre = () => { const a = $('antre'); a.style.display = antre.length ? 'block' : 'none'; a.textContent = 'antre ' + antre.length; };
+  async function pompa() {
+    if (sibuk) return; sibuk = true;
+    try { while (antre.length) { const ev = antre.shift(); tampilAntre(); try { await cetak(ev); } catch (e) { console.error(e); suara.henti(); } await tidur(250); } }
+    finally { sibuk = false; }
+  }
+  function masuk(ev) {
+    if (!ev || typeof ev !== 'object') return;
+    antre.push({ nama: ev.nama, avatar: ev.avatar, tier: ev.tier, jumlah: ev.jumlah, gift: ev.gift });
+    while (antre.length > 25) { const i = antre.findIndex(e => e.tier === 'print'); antre.splice(i < 0 ? 0 : i, 1); }
+    tampilAntre(); pompa();
+  }
+  function reset() {
+    gen++; suara.henti(); antre.length = 0; tampilAntre(); wajah('diam'); kartuTutup(); clearTimeout(RB.ts);
+    if (ROBOT) penTerbang(HOME.x, HOME.y, 500); else penEl.style.opacity = 0;
+    const lama = lembar.el; lama.classList.add('keluar'); setTimeout(() => lama.remove(), 900); lembar = buatLembar();
+  }
+
+  // ---- event dari server ----
+  const es = new EventSource('events');
+  es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.type === 'print') masuk(d); else if (d.type === 'reset') reset(); } catch {} };
+
+  // ---- demo: ?demo=1 ----
+  if (P.get('demo') === '1') {
+    const N = ['Starling', 'Adi A', 'Gabriel Silva', 'Si Bolang', 'Bethy', 'Mizuo Zilon', 'anak_desa', 'lionel'], T = ['print', 'print', 'print', 'big', 'legendary'], G = { print: 'Rose', big: 'Donut', legendary: 'Legendary Gift' };
+    const kirim = () => { const tr = T[Math.floor(Math.random() * T.length)]; masuk({ nama: N[Math.floor(Math.random() * N.length)], avatar: '', tier: tr, gift: G[tr], jumlah: 1 }); };
+    kirim(); setInterval(kirim, 5500 / KEC);
+  }
+  window.__printer = { masuk, keadaan: () => ({ antre: antre.length, sibuk, kepalaX: pen.x, wajah: RB.mode, lembarAda: meja.querySelectorAll('.lembar').length, terpakai: Object.entries(lembar.slots).filter(([, s]) => s.pakai).map(([k]) => k) }) };
+})();
+</script>
+</body>
+</html>

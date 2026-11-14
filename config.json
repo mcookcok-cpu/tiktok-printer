@@ -1,0 +1,27 @@
+{
+  "tiktokUsername": "kagura.titik",
+  "print": [
+    "rose",
+    "mawar"
+  ],
+  "big": [
+    "donut"
+  ],
+  "legendary": [],
+  "batasBig": 30,
+  "batasLegendary": 500,
+  "legenda": [
+    {
+      "ikon": "🌹",
+      "label": "Print"
+    },
+    {
+      "ikon": "🍩",
+      "label": "Big Print"
+    },
+    {
+      "ikon": "💎",
+      "label": "Legendary"
+    }
+  ]
+}

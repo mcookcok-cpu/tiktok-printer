@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galeri Sketsa</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--tulis:"Segoe Print","Bradley Hand","Chalkboard SE","Patrick Hand","Comic Sans MS",cursive}
+html,body{width:100%;height:100%;overflow:hidden;background:#c4c5ca}
+#stage{position:absolute;left:50%;top:50%;width:720px;height:1280px;margin:-640px 0 0 -360px;transform:scale(var(--s,1));overflow:hidden;
+ background:radial-gradient(ellipse 95% 38% at 50% 0%,#fdfdfd,transparent 72%),radial-gradient(ellipse 130% 50% at 50% 100%,#b4b5bc,transparent 72%),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.012) 0 1px,transparent 1px 3px),linear-gradient(#f0f0f2,#e4e5e9 55%,#d2d3d8)}
+body.polos #stage{background:none}
+svg{overflow:visible}
+#grid{position:absolute;inset:0;z-index:3;transition:opacity .5s,transform .5s}
+#grid.keluar{opacity:0;transform:translateY(-40px)}
+.sel{position:absolute;width:180px;height:228px}
+.fig{position:absolute;left:5px;top:0;width:170px;height:202px}
+.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.kepala{position:absolute;border-radius:50%;overflow:hidden;border:3px solid #111;background:#8a8a8f;display:flex;align-items:center;justify-content:center;font:800 22px system-ui,sans-serif;color:#fff}
+.kepala img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.kepala.t-print img{filter:grayscale(1) contrast(1.35) brightness(.82)}
+.kepala.t-big,.kepala.t-legendary{border-color:#b8860b}
+.nm{position:absolute;left:0;right:0;top:202px;text-align:center;font:400 21px/1.15 var(--tulis);color:#1b1b1b;white-space:nowrap;overflow:hidden;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.nm.tampil{opacity:1;transform:none}
+.nm b{font-weight:400;display:inline-block;padding:0 2px 1px}
+.nm.em b{border-bottom:3px solid #f2c94c}
+.hi{position:absolute;right:4px;top:2px;min-width:30px;height:24px;padding:0 6px;border:1.6px solid #2a2a2a;border-radius:12px;background:#fff;font:600 13px/21px var(--tulis);text-align:center;color:#222;opacity:0;transform:scale(.4);transition:opacity .3s,transform .3s cubic-bezier(.3,1.6,.5,1)}
+.hi::after{content:"";position:absolute;left:6px;bottom:-5px;width:8px;height:8px;background:#fff;border-right:1.6px solid #2a2a2a;border-bottom:1.6px solid #2a2a2a;transform:rotate(45deg)}
+.hi.hati{border:0;background:none;font:400 26px/24px system-ui,sans-serif;color:#111;padding:0}
+.hi.hati::after{display:none}
+.hi.tampil{opacity:1;transform:none}
+.kilau{position:absolute;width:11px;height:11px;background:#ffe27a;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:kilau 1.4s ease-in-out infinite;pointer-events:none}
+@keyframes kilau{0%,100%{transform:scale(0);opacity:0}50%{transform:scale(1.7);opacity:1}}
+#fitur{position:absolute;left:0;top:0;width:720px;height:280px;z-index:2}
+#fitur .sinar{position:absolute;left:50%;top:4px;width:330px;height:250px;margin-left:-165px;background:radial-gradient(ellipse at 50% 50%,rgba(255,226,140,.65),transparent 68%)}
+#fitur .fig{left:50%;top:20px;width:190px;height:226px;margin-left:-95px}
+#fitur .pita{position:absolute;left:50%;top:222px;transform:translateX(-50%) rotate(-1.5deg);min-width:200px;max-width:420px;padding:4px 30px 8px;text-align:center;font:italic 800 28px/1.15 var(--tulis);color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.45);white-space:nowrap;
+ background:linear-gradient(180deg,#e0bb5a,#a87a22);clip-path:polygon(2% 14%,12% 0,40% 9%,70% 0,98% 10%,100% 60%,92% 100%,55% 92%,20% 100%,0 85%)}
+#fitur.pop .fig,#fitur.pop .pita{animation:pop .7s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+#fitur .pita{animation-name:none}
+#fitur.pop .pita{animation:popp .7s cubic-bezier(.3,1.5,.5,1)}
+@keyframes popp{from{opacity:0;transform:translateX(-50%) rotate(-1.5deg) scale(.3)}}
+#petunjuk{position:absolute;left:0;right:0;top:112px;text-align:center;font:400 22px/1.7 var(--tulis);color:#555;opacity:.75}
+#petunjuk i{font-style:normal;font-size:26px;margin-right:6px}
+#halaman{position:absolute;left:22px;top:20px;z-index:8;padding:5px 16px;border-radius:14px;background:#7c5cff;color:#fff;font:700 18px system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+body.polos #halaman{display:none}
+#antre{position:absolute;right:20px;top:20px;z-index:9;padding:4px 12px;border-radius:14px;background:rgba(0,0,0,.55);color:#fff;font:700 16px system-ui,sans-serif;display:none}
+#pol{position:absolute;left:466px;top:1024px;width:240px;height:250px;z-index:5;pointer-events:none}
+.pol{position:absolute;width:106px;height:124px;padding:7px 7px 0;background:#fbfaf6;box-shadow:0 5px 12px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.06)}
+.pol .foto{position:relative;width:92px;height:96px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#fff6d8,#ecdcae)}
+.pol .foto .fig{left:0;top:0;transform:scale(.52);transform-origin:0 0}
+.pol .foto .fig{left:-2px;top:-2px}
+.pol .tulis{position:absolute;left:0;right:0;bottom:5px;text-align:center;font:400 12px var(--tulis);color:#333;white-space:nowrap;overflow:hidden;padding:0 4px}
+.pol .tape{position:absolute;left:50%;top:-9px;width:46px;height:16px;margin-left:-23px;background:rgba(120,170,230,.7);transform:rotate(-4deg)}
+.pol:nth-child(2n) .tape{background:rgba(240,150,180,.7);transform:rotate(5deg)}
+.pol .stk{position:absolute;right:-8px;top:-10px;font-size:26px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.pol.baru{animation:masukpol .7s cubic-bezier(.3,1.4,.5,1)}
+@keyframes masukpol{from{opacity:0;transform:translateY(60px) scale(.5) rotate(10deg)}}
+#pensil{position:absolute;left:0;top:0;width:0;height:0;z-index:7;will-change:transform;pointer-events:none}
+#pensil .pw{position:absolute;left:0;top:-14px;width:840px;height:28px;filter:drop-shadow(18px 24px 9px rgba(0,0,0,.32))}
+#pensil .kayu{position:absolute;left:0;top:0;width:82px;height:28px;background:linear-gradient(#f4dcb4,#d9b27c 55%,#b98c55);clip-path:polygon(0 50%,100% 0,100% 100%)}
+#pensil .grafit{position:absolute;left:0;top:0;width:23px;height:28px;background:#222;clip-path:polygon(0 50%,100% 36%,100% 64%)}
+#pensil .badan{position:absolute;left:80px;top:0;right:0;height:28px;background:linear-gradient(#5a5a60,#1c1c1f 38%,#050506 70%,#1a1a1c);border-radius:0 6px 6px 0}
+#pensil .cincin{position:absolute;left:72px;top:0;width:22px;height:28px;background:linear-gradient(#f6f6f8,#9aa0a8 45%,#d9dce0 60%,#5d636b)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="goyang" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <pattern id="hch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="4" stroke="#222" stroke-width=".9"/></pattern>
+  <linearGradient id="gShade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#666"/><stop offset="1" stop-color="#000"/></linearGradient>
+  <radialGradient id="gOrb"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#ffe27a"/><stop offset="1" stop-color="#ff9d2e" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gHalo"><stop offset=".55" stop-color="#ffe9a0" stop-opacity="0"/><stop offset=".85" stop-color="#ffd35a" stop-opacity=".6"/><stop offset="1" stop-color="#ffd35a" stop-opacity="0"/></radialGradient>
+</defs></svg>
+<div id="stage">
+  <div id="fitur"><div id="petunjuk"></div></div>
+  <div id="grid"></div>
+  <div id="pol"></div>
+  <div id="pensil"><div class="pw"><div class="kayu"></div><div class="grafit"></div><div class="badan"><i class="cincin"></i></div></div></div>
+  <div id="halaman">Galeri 0/12</div>
+  <div id="antre"></div>
+</div>
+<script>
+(() => {
+  const P = new URLSearchParams(location.search);
+  const KEC = Math.max(1, +P.get('cepat') || 1);               // pengali kecepatan (tes)
+  if (P.get('bg') === '0') document.body.classList.add('polos');
+  const $ = id => document.getElementById(id), stage = $('stage'), grid = $('grid'), pensil = $('pensil');
+  const tidur = ms => new Promise(r => setTimeout(r, ms / KEC));
+  const rnd = (a, b) => a + Math.random() * (b - a), pilih = a => a[Math.floor(Math.random() * a.length)], rad = d => d * Math.PI / 180;
+  const n1 = v => Math.round(v * 10) / 10;
+  function ukur() { stage.style.setProperty('--s', Math.min(innerWidth / 720, innerHeight / 1280)); }
+  addEventListener('resize', ukur); ukur();
+
+  const COLS = 4, KAP = 12, CW = 180, CH = 228, GY = 288;
+  const DUR = { print: 3200, big: 4200, legendary: 5600 };
+  let IKON = { print: '🌹', big: '🍩', legendary: '💎' };
+
+  // ---- petunjuk tingkat hadiah ----
+  function isiPetunjuk(items) {
+    const el = $('petunjuk'); el.textContent = '';
+    const t = ['sketsa', 'berwarna', 'tampil di atas'];
+    items.slice(0, 3).forEach((it, i) => {
+      const d = document.createElement('div'), ik = document.createElement('i');
+      ik.textContent = String(it.ikon || '').slice(0, 4); d.append(ik, document.createTextNode(String(it.label || '').slice(0, 20) + ' → ' + t[i])); el.append(d);
+    });
+    if (items[0]) IKON.print = String(items[0].ikon || '🌹').slice(0, 4);
+    if (items[1]) IKON.big = String(items[1].ikon || '🍩').slice(0, 4);
+    if (items[2]) IKON.legendary = String(items[2].ikon || '💎').slice(0, 4);
+  }
+  isiPetunjuk([{ ikon: '🌹', label: 'Print' }, { ikon: '🍩', label: 'Big' }, { ikon: '💎', label: 'Legendary' }]);
+  fetch('api/config').then(r => r.json()).then(c => { if (Array.isArray(c.legenda) && c.legenda.length) isiPetunjuk(c.legenda); }).catch(() => {});
+
+  // ================= FIGUR SKETSA PROSEDURAL =================
+  const POSE = [
+    { lean: 6, la: [145, 255], ra: [35, -70], ll: [112, 98], rl: [65, 88] },     // kuda-kuda tinju
+    { lean: 0, la: [-130, -95], ra: [-50, -85], ll: [108, 95], rl: [72, 85] },   // tangan terangkat
+    { lean: 20, la: [130, 170], ra: [25, -60], ll: [120, 160], rl: [40, 100] },  // berlari
+    { lean: 14, la: [150, 215], ra: [-5, -8], ll: [135, 100], rl: [30, 100] },   // tinju lurus
+    { lean: 0, la: [172, 178], ra: [8, 2], ll: [95, 92], rl: [85, 88] },         // melayang
+    { lean: -6, la: [160, 100], ra: [-75, -60], ll: [118, 100], rl: [62, 82] },  // merapal
+    { lean: -12, la: [160, 205], ra: [20, -30], ll: [100, 95], rl: [-8, -5] },   // tendangan
+    { lean: 28, la: [160, 200], ra: [70, 90], ll: [140, 90], rl: [35, 95] },     // mendarat
+  ];
+  function ambilPose() {
+    const Ps = JSON.parse(JSON.stringify(pilih(POSE)));
+    if (Math.random() < .5) {
+      Ps.lean = -Ps.lean;
+      for (const k of ['la', 'ra', 'll', 'rl']) Ps[k] = Ps[k].map(a => 180 - a);
+      [Ps.la, Ps.ra] = [Ps.ra, Ps.la]; [Ps.ll, Ps.rl] = [Ps.rl, Ps.ll];
+    }
+    for (const k of ['la', 'ra', 'll', 'rl']) Ps[k] = Ps[k].map(a => a + rnd(-8, 8));
+    Ps.lean += rnd(-4, 4);
+    return Ps;
+  }
+  const seg = (o, a, l) => ({ x: o.x + Math.cos(rad(a)) * l, y: o.y + Math.sin(rad(a)) * l });
+  function kerangka(Ps) {
+    const hip = { x: 80, y: 106 }, ln = rad(Ps.lean), up = { x: Math.sin(ln), y: -Math.cos(ln) }, rt = { x: Math.cos(ln), y: Math.sin(ln) };
+    const neck = { x: hip.x + up.x * 42, y: hip.y + up.y * 42 };
+    const mv = (o, d, k) => ({ x: o.x + d.x * k, y: o.y + d.y * k });
+    const sL = mv(mv(neck, rt, -17), up, -3), sR = mv(mv(neck, rt, 17), up, -3);
+    const hL = mv(hip, rt, -9), hR = mv(hip, rt, 9), head = { ...mv(neck, up, 21), r: 20 };
+    const arm = (s, a) => { const e = seg(s, a[0], 27); return [s, e, seg(e, a[1], 26)]; };
+    const leg = (h, a) => { const k = seg(h, a[0], 35); return [h, k, seg(k, a[1], 35)]; };
+    return { hip, neck, sL, sR, hL, hR, head, la: arm(sL, Ps.la), ra: arm(sR, Ps.ra), ll: leg(hL, Ps.ll), rl: leg(hR, Ps.rl), ps: Ps };
+  }
+  const PAL = [
+    { main: '#2b3a67', acc: '#e0b44c', em: '#e4572e' }, { main: '#8a2331', acc: '#f0c94a', em: '#ffffff' },
+    { main: '#1f6f5c', acc: '#f2e3a0', em: '#ffd166' }, { main: '#5b2a86', acc: '#ffd166', em: '#ffffff' },
+    { main: '#1d1d26', acc: '#33c3ff', em: '#33c3ff' }, { main: '#c8402a', acc: '#ffb347', em: '#ffffff' },
+  ];
+  const PALL = [{ main: '#f3ecd8', acc: '#d9a227', em: '#7c5cff' }, { main: '#2a2438', acc: '#ffcf4a', em: '#ff6a3d' }];
+  let uid = 0;
+  function buatFigur(tier) {
+    const K = kerangka(ambilPose()), id = 'm' + (++uid), warn = tier !== 'print', pal = warn ? pilih(tier === 'legendary' ? PALL : PAL) : null;
+    const C = { main: warn ? pal.main : '#fff', acc: warn ? pal.acc : '#fff', em: warn ? pal.em : '#fff' };
+    const pt = p => n1(p.x) + ',' + n1(p.y);
+    const S = [];
+    const ln = (p, q, w, role) => S.push({ t: 'l', p, q, w, role }), ci = (c, r, role) => S.push({ t: 'c', c, r, role });
+    S.push({ t: 'p', pts: [K.sL, K.sR, K.hR, K.hL], role: 'main' });
+    for (const L of [K.ll, K.rl]) { ln(L[0], L[1], 12, 'main'); ln(L[1], L[2], 10, 'main'); ci(L[2], 6.5, 'acc'); }
+    for (const A of [K.la, K.ra]) { ln(A[0], A[1], 9.5, 'main'); ln(A[1], A[2], 8, 'main'); ci(A[2], 6, 'acc'); ci(A[0], 8, 'acc'); }
+    ln(K.hL, K.hR, 5, 'acc');
+    const lapis = mode => S.map(s => {
+      const col = mode === 'mask' ? 'url(#gShade)' : C[s.role];
+      if (s.t === 'p') { const pts = s.pts.map(pt).join(' '); return mode === 'out' ? `<polygon points="${pts}" fill="#111" stroke="#111" stroke-width="3" stroke-linejoin="round"/>` : `<polygon points="${pts}" fill="${col}"/>`; }
+      if (s.t === 'l') return mode === 'out'
+        ? `<line x1="${n1(s.p.x)}" y1="${n1(s.p.y)}" x2="${n1(s.q.x)}" y2="${n1(s.q.y)}" stroke="#111" stroke-width="${s.w + 3}" stroke-linecap="round"/>`
+        : `<line x1="${n1(s.p.x)}" y1="${n1(s.p.y)}" x2="${n1(s.q.x)}" y2="${n1(s.q.y)}" stroke="${col}" stroke-width="${s.w}" stroke-linecap="round"/>`;
+      return mode === 'out' ? `<circle cx="${n1(s.c.x)}" cy="${n1(s.c.y)}" r="${s.r + 1.5}" fill="#111"/>` : `<circle cx="${n1(s.c.x)}" cy="${n1(s.c.y)}" r="${s.r}" fill="${col}"/>`;
+    }).join('');
+    // ---- detail garis ----
+    const ch = { x: K.neck.x + (K.hip.x - K.neck.x) * .3, y: K.neck.y + (K.hip.y - K.neck.y) * .3 };
+    let det = `<path d="M${pt(K.neck)}L${pt(K.hip)}" stroke="#111" stroke-width=".9" fill="none"/>`
+      + `<path d="M${pt(K.sL)}Q${n1(K.neck.x)},${n1(K.neck.y + 16)} ${pt(K.sR)}" stroke="#111" stroke-width=".9" fill="none"/>`
+      + `<circle cx="${n1(ch.x)}" cy="${n1(ch.y)}" r="4.5" fill="${warn ? C.em : '#fff'}" stroke="#111" stroke-width="1"/>`;
+    for (const j of [K.la[1], K.ra[1], K.ll[1], K.rl[1]]) det += `<circle cx="${n1(j.x)}" cy="${n1(j.y)}" r="3.2" fill="none" stroke="#111" stroke-width=".8"/>`;
+    // ---- tambahan (belakang & depan) ----
+    const hs = K.head, back = [], front = [], ekstra = [];
+    const kapeP = Math.random() < .55, sayapP = Math.random() < .45;
+    const pil = tier === 'legendary' ? ['halo', 'tongkat'].concat(sayapP ? ['sayap'] : [], kapeP ? ['cape'] : [])
+      : tier === 'big' ? [pilih(['cape', 'sayap']), pilih(['pedang', 'bola', 'pusaran'])]
+      : [].concat(kapeP ? ['cape'] : [], sayapP ? ['sayap'] : [], Math.random() < .6 ? [pilih(['pusaran', 'pedang', 'bola'])] : []);
+    for (const e of pil) ekstra.push(e);
+    if (!ekstra.length) ekstra.push('pusaran');
+    const sk = warn ? '#fff' : '#fff', tinta = warn ? pal.acc : '#111';
+    for (const e of ekstra) {
+      if (e === 'cape') {
+        const dx = (Math.random() < .5 ? -1 : 1) * rnd(18, 32), by = K.hip.y + rnd(40, 60), hx = K.hip.x;
+        back.push(`<path d="M${pt(K.sL)}L${pt(K.sR)}Q${n1(K.sR.x + dx * .8)},${n1((K.sR.y + by) / 2)} ${n1(hx + dx)},${n1(by)}L${n1(hx + dx * .45)},${n1(by - 10)}L${n1(hx + dx * .1)},${n1(by + 8)}Q${n1(K.sL.x + dx * .3)},${n1((K.sL.y + by) / 2)} ${pt(K.sL)}Z" fill="${warn ? pal.em : sk}" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>`
+          + `<path d="M${n1(K.neck.x)},${n1(K.neck.y + 6)}L${n1(hx + dx * .5)},${n1(by - 6)}M${n1(K.neck.x + dx * .15)},${n1(K.neck.y + 8)}L${n1(hx + dx * .85)},${n1(by - 2)}" stroke="#111" stroke-width=".8" fill="none"/>`);
+      } else if (e === 'sayap') {
+        for (const s of [-1, 1]) {
+          const o = { x: K.neck.x + s * 5, y: K.neck.y + 8 };
+          const R = [[0, 0], [26, -34], [52, -38], [46, -24], [66, -22], [50, -8], [60, 6], [36, 6], [10, 16]].map(([a, b]) => ({ x: o.x + s * a, y: o.y + b }));
+          back.push(`<polygon points="${R.map(pt).join(' ')}" fill="${warn ? '#fff8e0' : sk}" stroke="#111" stroke-width="1.5" stroke-linejoin="round"/>`
+            + [2, 4, 6].map(i => `<path d="M${n1(o.x + s * 8)},${n1(o.y + 4)}L${pt(R[i])}" stroke="#111" stroke-width=".8" fill="none"/>`).join(''));
+        }
+      } else if (e === 'pusaran') {
+        for (let i = 0; i < 7; i++) {
+          let x = rnd(6, 154), y = rnd(24, 170); if (Math.abs(x - 80) < 28) x += x < 80 ? -30 : 30;
+          back.push(`<path d="M${n1(x)},${n1(y)}c${n1(rnd(-10, 10))},${n1(rnd(-18, -6))} ${n1(rnd(8, 24))},${n1(rnd(-22, -8))} ${n1(rnd(16, 34))},${n1(rnd(-8, 4))}" stroke="${tinta}" stroke-width="1.3" fill="none" stroke-linecap="round"/>`);
+        }
+      } else if (e === 'pedang' || e === 'tongkat') {
+        const H = K.ra[2], a = K.ps.ra[1], d = { x: Math.cos(rad(a)), y: Math.sin(rad(a)) }, L = e === 'tongkat' ? 52 : 46;
+        const p1 = { x: H.x - d.x * 8, y: H.y - d.y * 8 }, p2 = { x: H.x + d.x * L, y: H.y + d.y * L };
+        front.push(`<line x1="${n1(p1.x)}" y1="${n1(p1.y)}" x2="${n1(p2.x)}" y2="${n1(p2.y)}" stroke="#111" stroke-width="5" stroke-linecap="round"/><line x1="${n1(p1.x)}" y1="${n1(p1.y)}" x2="${n1(p2.x)}" y2="${n1(p2.y)}" stroke="${e === 'tongkat' ? '#e0b030' : '#d4dae0'}" stroke-width="2.6" stroke-linecap="round"/>`);
+        if (e === 'pedang') front.push(`<line x1="${n1(H.x + d.x * 7 - d.y * 8)}" y1="${n1(H.y + d.y * 7 + d.x * 8)}" x2="${n1(H.x + d.x * 7 + d.y * 8)}" y2="${n1(H.y + d.y * 7 - d.x * 8)}" stroke="#111" stroke-width="3.4" stroke-linecap="round"/>`);
+        else front.push(`<circle cx="${n1(p2.x)}" cy="${n1(p2.y)}" r="13" fill="url(#gOrb)"/><circle cx="${n1(p2.x)}" cy="${n1(p2.y)}" r="5.5" fill="#fff6c8" stroke="#111" stroke-width="1"/>`);
+      } else if (e === 'bola') {
+        const H = K.la[2], o = { x: H.x + (H.x < 80 ? -4 : 4), y: H.y - 11 };
+        let sp = ''; for (let i = 0; i < 8; i++) { const an = i * Math.PI / 4; sp += `M${n1(o.x + Math.cos(an) * 6)},${n1(o.y + Math.sin(an) * 6)}L${n1(o.x + Math.cos(an) * 12)},${n1(o.y + Math.sin(an) * 12)}`; }
+        front.push(`<circle cx="${n1(o.x)}" cy="${n1(o.y)}" r="${warn ? 11 : 6}" fill="${warn ? 'url(#gOrb)' : '#fff'}" stroke="#111" stroke-width="1.2"/><path d="${sp}" stroke="#111" stroke-width="1" fill="none"/>`);
+      } else if (e === 'halo') {
+        let ry = ''; for (let i = 0; i < 14; i++) { const an = i * Math.PI / 7; ry += `M${n1(hs.x + Math.cos(an) * 31)},${n1(hs.y + Math.sin(an) * 31)}L${n1(hs.x + Math.cos(an) * (i % 2 ? 38 : 44))},${n1(hs.y + Math.sin(an) * (i % 2 ? 38 : 44))}`; }
+        back.unshift(`<circle cx="${n1(hs.x)}" cy="${n1(hs.y)}" r="50" fill="url(#gHalo)"/><circle cx="${n1(hs.x)}" cy="${n1(hs.y)}" r="29" fill="none" stroke="#e0a82a" stroke-width="2.6"/><path d="${ry}" stroke="#e8b83a" stroke-width="1.8" stroke-linecap="round" fill="none"/>`);
+      }
+    }
+    if (tier === 'legendary') for (let i = 0; i < 5; i++) { const x = rnd(10, 150), y = rnd(14, 175), r = rnd(3.5, 6); front.push(`<polygon points="${n1(x)},${n1(y - r)} ${n1(x + r * .3)},${n1(y - r * .3)} ${n1(x + r)},${n1(y)} ${n1(x + r * .3)},${n1(y + r * .3)} ${n1(x)},${n1(y + r)} ${n1(x - r * .3)},${n1(y + r * .3)} ${n1(x - r)},${n1(y)} ${n1(x - r * .3)},${n1(y - r * .3)}" fill="#ffe27a" stroke="#c9961a" stroke-width=".6"/>`); }
+    const svg = `<svg viewBox="0 0 160 190" xmlns="http://www.w3.org/2000/svg"><g filter="url(#goyang)">`
+      + back.join('') + `<g>${lapis('out')}</g><g>${lapis('fill')}</g>`
+      + `<mask id="${id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="200" height="230"><g>${lapis('mask')}</g></mask>`
+      + `<rect x="-20" y="-20" width="200" height="230" fill="url(#hch)" mask="url(#${id})" opacity="${warn ? .35 : .85}"/>`
+      + det + front.join('') + `</g></svg>`;
+    return { svg, head: K.head, K };
+  }
+  const warnaNama = n => { let h = 0; for (const ch of n) h = (h * 31 + ch.codePointAt(0)) % 360; return 'hsl(' + h + ' 45% 38%)'; };
+
+  // ---- satu sel galeri ----
+  function buatSel(tier, nama, ps) {
+    const F = buatFigur(tier), sc = 170 / 160;
+    const sel = document.createElement('div'); sel.className = 'sel'; sel.style.left = ps.x + 'px'; sel.style.top = ps.y + 'px';
+    const fig = document.createElement('div'); fig.className = 'fig'; fig.innerHTML = F.svg;
+    const kep = document.createElement('div'); kep.className = 'kepala t-' + tier;
+    const r = F.head.r * sc; kep.style.left = (F.head.x * sc - r) + 'px'; kep.style.top = (F.head.y * sc - r) + 'px'; kep.style.width = kep.style.height = (2 * r) + 'px';
+    kep.textContent = (Array.from(nama.trim())[0] || '?').toUpperCase(); if (tier !== 'print') kep.style.background = warnaNama(nama); else kep.style.background = '#6e6e73';
+    fig.append(kep);
+    const nm = document.createElement('div'); nm.className = 'nm' + (tier === 'print' ? '' : ' em');
+    const b = document.createElement('b'); b.textContent = nama; nm.append(b);
+    if (nama.length > 14) nm.style.fontSize = Math.max(13, 21 * 14 / nama.length) + 'px';
+    const hi = document.createElement('div'); hi.className = 'hi';
+    sel.append(fig, nm, hi); fig.style.clipPath = 'inset(-14px -26px 100% -26px)';
+    return { sel, fig, nm, hi, kep };
+  }
+  function muatFoto(kep, avatar) {
+    return new Promise(res => {
+      if (!/^https:\/\//.test(avatar || '')) return res();
+      const img = new Image(); let ok = false; const akhir = b => { if (ok) return; ok = true; if (b) { kep.textContent = ''; kep.append(img); } res(); };
+      img.referrerPolicy = 'no-referrer'; img.onload = () => akhir(true); img.onerror = () => akhir(false); img.src = avatar; setTimeout(() => akhir(false), 2500);
+    });
+  }
+
+  // ---- pensil ----
+  const IDLE = { x: -30, y: 1150 };   // pensil istirahat di pojok kiri bawah (tidak menutup polaroid)
+  const pen = { x: IDLE.x, y: IDLE.y, tx: IDLE.x, ty: IDLE.y };
+  let gambar = null, xPrev = IDLE.x, tPrev = 0;
+  function loop(t) {
+    if (gambar) {
+      const p = Math.min(1, (t - gambar.t0) / gambar.dur);
+      gambar.fig.style.clipPath = `inset(-14px -26px ${(1 - p) * 100}% -26px)`;
+      pen.x = gambar.cx + gambar.w * .32 * Math.sin((t - gambar.t0) / (150 / KEC)); pen.y = gambar.y0 + p * gambar.h;
+      if (p >= 1 && gambar.selesai) { const f = gambar.selesai; gambar.selesai = null; f(); }
+    } else {
+      pen.x += (pen.tx - pen.x) * Math.min(1, .12 * KEC); pen.y += (pen.ty - pen.y) * Math.min(1, .12 * KEC);
+    }
+    pensil.style.transform = `translate(${n1(pen.x)}px,${n1(pen.y)}px) rotate(26deg)`;
+    if (tPrev) suara.gores(gambar ? Math.abs(pen.x - xPrev) / Math.max(.001, (t - tPrev) / 1000) : 0);
+    xPrev = pen.x; tPrev = t; requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  async function geser(x, y) {
+    pen.tx = x; pen.ty = y; const t0 = performance.now();
+    while ((Math.abs(pen.x - x) > 2 || Math.abs(pen.y - y) > 2) && performance.now() - t0 < 1100 / KEC) await new Promise(r => setTimeout(r, 16));
+  }
+
+  // ---- suara goresan pensil (Web Audio) ----  ?suara=0 bisu | ?vol=0.6
+  const suara = (() => {
+    const MUTE = P.get('suara') === '0', VOL = P.get('vol') === null ? 0.9 : Math.min(1, Math.max(0, +P.get('vol') || 0));
+    let ac = null, master = null, noiseBuf = null, aktif = null, an = null, gestur = false, diuji = false;
+    const hint = document.createElement('div'); hint.textContent = '🔇 klik layar untuk suara';
+    hint.style.cssText = 'position:absolute;right:20px;top:20px;z-index:9;padding:4px 12px;border-radius:14px;background:rgba(0,0,0,.55);color:#fff;font:700 15px system-ui,sans-serif;display:none';
+    stage.append(hint);
+    function tandai() { if (ac && ac.state === 'running' && gestur && !diuji) { diuji = true; bip(); } hint.style.display = (MUTE || document.body.classList.contains('polos') || (ac && ac.state === 'running')) ? 'none' : 'block'; }
+    function init() {
+      if (ac || MUTE) return ac;
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+      ac = new AC(); master = ac.createGain(); master.gain.value = VOL; master.connect(ac.destination); an = ac.createAnalyser(); an.fftSize = 1024; master.connect(an);
+      window.__suaraNilai = () => { const d = new Float32Array(an.fftSize); an.getFloatTimeDomainData(d); let m = 0; for (const x of d) m += x * x; return { rms: Math.sqrt(m / d.length), state: ac.state }; };
+      noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      ac.onstatechange = tandai; return ac;
+    }
+    function bip() { const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(.2, t + .01); g.gain.exponentialRampToValueAtTime(0.0001, t + .2); o.connect(g); g.connect(master); o.start(t); o.stop(t + .25); }
+    function buka() { if (!init()) return; if (ac.state !== 'running') ac.resume().catch(() => {}); tandai(); }
+    ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, () => { gestur = true; buka(); }, { passive: true }));
+    init(); tandai(); setTimeout(tandai, 600);
+    function ding(tier) {
+      if (!ac) return;
+      const notes = tier === 'legendary' ? [784, 988, 1175, 1568, 2093] : tier === 'big' ? [1046.5, 1568] : [1318.5], t0 = ac.currentTime + 0.03;
+      notes.forEach((f, i) => { const t = t0 + i * 0.09 / KEC; for (const [fr, vol] of [[f, .45], [f * 2, .12]]) {
+        const o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.value = fr;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .006); g.gain.exponentialRampToValueAtTime(0.0001, t + (tier === 'legendary' ? 1.1 : .6)); o.connect(g); g.connect(master); o.start(t); o.stop(t + 1.2); } });
+    }
+    function mulai() {
+      buka(); if (!ac || aktif) return;
+      const t = ac.currentTime, n = ac.createBufferSource(); n.buffer = noiseBuf; n.loop = true;
+      const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2000;
+      const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 4300; bp.Q.value = .7;
+      const g = ac.createGain(); g.gain.value = 0.0001; const amp = ac.createGain(); amp.gain.value = 0.7; n.connect(hp); hp.connect(bp); bp.connect(amp); amp.connect(g); g.connect(master); n.start(t); aktif = { n, g };
+    }
+    function henti(tier, bunyi) {
+      if (!aktif) return; const a = aktif; aktif = null; const t = ac.currentTime;
+      a.g.gain.cancelScheduledValues(t); a.g.gain.setTargetAtTime(0.0001, t, .04); try { a.n.stop(t + .25); } catch {}
+      if (bunyi) ding(tier);
+    }
+    return {
+      mulai, selesai: tier => henti(tier, true), henti: () => henti(null, false),
+      gores: v => { if (aktif) aktif.g.gain.setTargetAtTime(Math.min(1, .22 + v / 700), ac.currentTime, .035); },
+      kertas: () => { if (!ac) return; // desir lembar dibalik
+        const t = ac.currentTime, n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); n.buffer = noiseBuf;
+        f.type = 'bandpass'; f.Q.value = .9; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(350, t + .55);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(.35, t + .06); g.gain.exponentialRampToValueAtTime(0.0001, t + .6);
+        n.connect(f); f.connect(g); g.connect(master); n.start(t, 0, .65); },
+    };
+  })();
+
+  // ---- fitur (legendary terbaru) & polaroid ----
+  const koleksi = [];
+  function setFitur(nama, figEl) {
+    const f = $('fitur'); f.querySelectorAll('.fig,.pita,.sinar').forEach(e => e.remove()); $('petunjuk').style.display = 'none';
+    const s = document.createElement('div'); s.className = 'sinar'; const c = figEl.cloneNode(true); c.style.clipPath = 'none';
+    const pt = document.createElement('div'); pt.className = 'pita'; pt.textContent = nama; if (nama.length > 14) pt.style.fontSize = Math.max(17, 28 * 14 / nama.length) + 'px';
+    f.append(s, c, pt); f.classList.remove('pop'); void f.offsetWidth; f.classList.add('pop');
+  }
+  const POS = [[0, 4, -4], [112, 0, 3], [4, 128, 2], [114, 130, -3]];
+  function renderPol(baru) {
+    const w = $('pol'); w.textContent = '';
+    koleksi.forEach((k, i) => {
+      const d = document.createElement('div'); d.className = 'pol' + (baru && i === 0 ? ' baru' : '');
+      d.style.left = POS[i][0] + 'px'; d.style.top = POS[i][1] + 'px'; d.style.transform = `rotate(${POS[i][2]}deg)`;
+      const fo = document.createElement('div'); fo.className = 'foto'; const c = k.fig.cloneNode(true); c.style.clipPath = 'none'; fo.append(c);
+      const tp = document.createElement('i'); tp.className = 'tape'; const sk = document.createElement('span'); sk.className = 'stk'; sk.textContent = IKON[k.tier] || '🌹';
+      const tl = document.createElement('div'); tl.className = 'tulis'; tl.textContent = k.nama;
+      d.append(fo, tl, tp, sk); w.append(d);
+    });
+  }
+
+  // ---- alur satu cetakan ----
+  let hal = 1, slot = 0; const pernah = new Set();
+  const posisi = i => ({ x: (i % COLS) * CW, y: GY + Math.floor(i / COLS) * CH });
+  const pill = () => { $('halaman').textContent = 'Galeri ' + slot + '/' + KAP; };
+  async function balikHalaman() {
+    grid.classList.add('keluar'); suara.kertas(); await tidur(600); grid.textContent = ''; slot = 0; hal++; pill(); grid.classList.remove('keluar'); await tidur(300);
+  }
+  function kilau(sel) {
+    for (let i = 0; i < 10; i++) { const k = document.createElement('i'); k.className = 'kilau'; k.style.left = rnd(4, 92) + '%'; k.style.top = rnd(2, 85) + '%'; k.style.animationDelay = rnd(0, 1.4) + 's'; sel.append(k); }
+  }
+  async function cetak(ev) {
+    const tier = ['print', 'big', 'legendary'].includes(ev.tier) ? ev.tier : 'print';
+    const nama = String(ev.nama || 'penonton').slice(0, 24);
+    if (slot >= KAP) await balikHalaman();
+    const ps = posisi(slot++); pill();
+    const { sel, fig, nm, hi, kep } = buatSel(tier, nama, ps);
+    grid.append(sel); await muatFoto(kep, ev.avatar);
+    if (tier === 'print' && kep.querySelector('img')) { /* foto jadi abu-abu lewat CSS */ }
+    const cx = ps.x + CW / 2;
+    await geser(cx, ps.y + 8);
+    gambar = { fig, cx, y0: ps.y + 8, h: 186, w: CW, t0: performance.now(), dur: DUR[tier] / KEC, selesai: null };
+    suara.mulai(); await new Promise(res => { gambar.selesai = res; });
+    gambar = null; suara.selesai(tier); fig.style.clipPath = 'none';
+    nm.classList.add('tampil'); const ulang = pernah.has(nama.toLowerCase()); pernah.add(nama.toLowerCase());
+    hi.textContent = ulang ? '♥' : 'Hi'; hi.classList.toggle('hati', ulang); hi.classList.add('tampil');
+    if (tier !== 'print') { kilau(sel); koleksi.unshift({ fig, nama, tier }); koleksi.length = Math.min(koleksi.length, 4); renderPol(true); }
+    if (tier === 'legendary') setFitur(nama, fig);
+    await tidur(450);
+  }
+
+  // ---- antrean ----
+  const antre = []; let sibuk = false;
+  const tampilAntre = () => { const a = $('antre'); a.style.display = antre.length ? 'block' : 'none'; a.textContent = 'antre ' + antre.length; };
+  async function pompa() {
+    if (sibuk) return; sibuk = true;
+    try { while (antre.length) { const ev = antre.shift(); tampilAntre(); try { await cetak(ev); } catch (e) { console.error(e); gambar = null; suara.henti(); } await tidur(200); } }
+    finally { sibuk = false; pen.tx = IDLE.x; pen.ty = IDLE.y; }
+  }
+  function masuk(ev) {
+    if (!ev || typeof ev !== 'object') return;
+    antre.push({ nama: ev.nama, avatar: ev.avatar, tier: ev.tier, jumlah: ev.jumlah });
+    while (antre.length > 25) { const i = antre.findIndex(e => e.tier === 'print'); antre.splice(i < 0 ? 0 : i, 1); }
+    tampilAntre(); pompa();
+  }
+  function reset() {
+    antre.length = 0; tampilAntre(); gambar = null; suara.henti(); grid.textContent = ''; slot = 0; hal = 1; pernah.clear(); koleksi.length = 0; renderPol(false); pill();
+    $('fitur').querySelectorAll('.fig,.pita,.sinar').forEach(e => e.remove()); $('petunjuk').style.display = '';
+  }
+
+  const es = new EventSource('events');
+  es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.type === 'print') masuk(d); else if (d.type === 'reset') reset(); } catch {} };
+
+  // ---- demo: ?demo=1 ----
+  if (P.get('demo') === '1') {
+    const N = ['Vanessa', 'Askar Millioner', 'kUya_jOmMZz12', 'gman_67', 'MITTIT79', 'Gavin Russell', 'jerun00', 'Charlie West', 'Si Bolang', 'Bethy'], T = ['print', 'print', 'print', 'print', 'big', 'legendary'];
+    const kirim = () => masuk({ nama: pilih(N), avatar: '', tier: pilih(T), jumlah: 1 });
+    kirim(); setInterval(kirim, 5200 / KEC);
+  }
+  pill();
+  window.__galeri = { masuk, buatFigur, keadaan: () => ({ antre: antre.length, sibuk, slot, hal, sel: grid.querySelectorAll('.sel').length, pol: koleksi.length }) };
+})();
+</script>
+</body>
+</html>
